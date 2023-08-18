@@ -10,9 +10,9 @@ private val KEYWORDS = mapOf(
     "let" to TokenKind.Let,
     "fn" to TokenKind.Fn,
     "if" to TokenKind.If,
-    "Else" to TokenKind.Else,
-    "True" to TokenKind.True,
-    "False" to TokenKind.False,
+    "else" to TokenKind.Else,
+    "true" to TokenKind.True,
+    "false" to TokenKind.False,
 )
 
 private fun lookupIdent(s: String) = KEYWORDS[s] ?: TokenKind.Ident
@@ -45,19 +45,36 @@ class Lexer(private val input: String) {
             '*' -> t.kind = TokenKind.Asterisk
             '/' -> t.kind = TokenKind.Slash
 
-            '<' -> t.kind = TokenKind.LessThan
-            '>' -> t.kind = TokenKind.GreaterThan
-
             '=' -> {
-                t.kind = if (peak() == '=') TokenKind.Equal
-                else TokenKind.Assign
-                readChar()
+                t.kind = if (peak() == '=') {
+                    readChar()
+                    t.span.len = 2
+                    TokenKind.Equal
+                } else TokenKind.Assign
             }
 
             '!' -> {
-                t.kind = if (peak() == '=') TokenKind.NotEqual
-                else TokenKind.Bang
-                readChar()
+                t.kind = if (peak() == '=') {
+                    readChar()
+                    t.span.len = 2
+                    TokenKind.NotEqual
+                } else TokenKind.Bang
+            }
+
+            '<' -> {
+                t.kind = if (peak() == '=') {
+                    readChar()
+                    t.span.len = 2
+                    TokenKind.LessEqual
+                } else TokenKind.LessThan
+            }
+
+            '>' -> {
+                t.kind = if (peak() == '=') {
+                    readChar()
+                    t.span.len = 2
+                    TokenKind.GreaterEqual
+                } else TokenKind.GreaterThan
             }
 
             '"' -> {
@@ -105,6 +122,16 @@ class Lexer(private val input: String) {
     private fun skipWhitespace() {
         while (ch.isWhitespace()) {
             readChar()
+        }
+    }
+
+    private fun skipComment() {
+        if (ch == '/' && peak() == '/') {
+            readChar()
+
+            while (ch != '\n') {
+                readChar()
+            }
         }
     }
 

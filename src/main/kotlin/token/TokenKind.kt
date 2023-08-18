@@ -21,6 +21,8 @@ enum class TokenKind {
     Bang,
     LessThan,
     GreaterThan,
+    LessEqual,
+    GreaterEqual,
 
     // delimiters
     Comma,
