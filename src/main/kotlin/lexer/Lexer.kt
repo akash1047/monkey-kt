@@ -28,6 +28,8 @@ class Lexer(private val input: String) {
 
     fun nextToken(): Token {
         skipWhitespace()
+        skipComment()
+        skipWhitespace()
 
         val t = Token(TokenKind.Illegal, Span(pos, 1))
 

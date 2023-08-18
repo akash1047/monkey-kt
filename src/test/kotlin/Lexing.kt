@@ -5,15 +5,36 @@ import token.TokenKind
 
 class Lexing {
     @Test
-    fun compareExpression() {
-        val input = """
-            true != false
-            false == !true 
-            10 <= 10
-            10 < 20
-            100 > 12
-            12 >= 12
-        """.trimIndent()
+    fun comment() {
+        val input = """// a single line comment
+10 // a integer literal
+"ten" // a string literal
+"""
+
+        val lexer = Lexer(input)
+        var token = lexer.nextToken()
+
+        fun match(t: TokenKind, v: String) {
+            assertEquals(t, token.kind)
+            assertEquals(v, lexer.extract(token.span))
+            token = lexer.nextToken()
+        }
+
+        match(TokenKind.IntLiteral, "10")
+        match(TokenKind.StringLiteral, "\"ten\"")
+        match(TokenKind.Eof, "")
+    }
+
+
+    @Test
+    fun comparisonExpression() {
+        val input = """true != false
+false == !true 
+10 <= 10
+10 < 20
+100 > 12
+12 >= 12
+"""
 
         val lexer = Lexer(input)
         var token = lexer.nextToken()
