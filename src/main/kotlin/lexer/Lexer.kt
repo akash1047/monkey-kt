@@ -13,6 +13,7 @@ private val KEYWORDS = mapOf(
     "else" to TokenKind.Else,
     "true" to TokenKind.True,
     "false" to TokenKind.False,
+    "return" to TokenKind.Return,
 )
 
 private fun lookupIdent(s: String) = KEYWORDS[s] ?: TokenKind.Ident

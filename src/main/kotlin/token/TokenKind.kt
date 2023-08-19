@@ -40,4 +40,5 @@ enum class TokenKind {
     Else,
     True,
     False,
+    Return,
 }
