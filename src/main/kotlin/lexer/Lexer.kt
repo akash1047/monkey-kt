@@ -110,13 +110,16 @@ class Lexer(private val input: String) {
         // so incrementing position to consume first "
         readChar()
 
-        while (ch != '"') {
+        while (ch != '"' && ch != NULL) {
             readChar()
         }
 
         // since the above loop is stopped because
-        // ch is " so incrementing position to consume "
-        readChar()
+        // ch is " or Eof encountered
+        // so incrementing if ch is " then consume "
+        if (ch == '"') {
+            readChar()
+        }
 
         return Token(TokenKind.StringLiteral, Span(start, pos - start))
     }
@@ -131,7 +134,7 @@ class Lexer(private val input: String) {
         if (ch == '/' && peak() == '/') {
             readChar()
 
-            while (ch != '\n') {
+            while (ch != '\n' && ch != NULL) {
                 readChar()
             }
         }

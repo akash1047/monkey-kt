@@ -25,6 +25,26 @@ class Lexing {
         match(TokenKind.Eof, "")
     }
 
+    @Test
+    fun endingWithEof() {
+        fun testing(input: String, k: TokenKind, v: String) {
+            val lexer = Lexer(input)
+
+            val token = lexer.nextToken()
+            assertEquals(k, token.kind)
+            assertEquals(v, lexer.extract(token.span))
+
+            val eof = lexer.nextToken()
+            assertEquals(TokenKind.Eof, eof.kind)
+            assertEquals("", lexer.extract(eof.span))
+        }
+
+        // testing("1234", TokenKind.IntLiteral, "1234")
+        // testing("1234.", TokenKind.FloatLiteral, "1234.")
+        // testing("1234.56", TokenKind.FloatLiteral, "1234.56")
+        testing("\"not enclosed in double quotes", TokenKind.StringLiteral, "\"not enclosed in double quotes")
+        testing("// starting with comment \"not enclosed in double quotes", TokenKind.Eof, "")
+    }
 
     @Test
     fun comparisonExpression() {
