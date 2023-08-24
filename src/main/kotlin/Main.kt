@@ -17,7 +17,7 @@ fun main() {
 
         var t = l.nextToken()
         while (t.kind != TokenKind.Eof) {
-            println("Token( ${t.kind}, \"${l.extract(t.span)}\" )")
+            println(t)
             t = l.nextToken()
         }
     }
