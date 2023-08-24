@@ -6,9 +6,9 @@ enum class TokenKind {
 
     // identifier + literals
     Ident,
-    FloatLiteral,
-    IntLiteral,
-    StringLiteral,
+    Float,
+    Int,
+    String,
 
     // operators
     Assign,
@@ -16,22 +16,22 @@ enum class TokenKind {
     Minus,
     Asterisk,
     Slash,
-    Equal,
-    NotEqual,
+    Eq,
+    NEq,
     Bang,
-    LessThan,
-    GreaterThan,
-    LessEqual,
-    GreaterEqual,
+    LT,
+    GT,
+    LEq,
+    GEq,
 
     // delimiters
     Comma,
     Semicolon,
 
-    LParan,
-    RParan,
-    LBrace,
-    RBrace,
+    Lparan,
+    Rparan,
+    Lbrace,
+    Rbrace,
 
     // keywords
     Let,

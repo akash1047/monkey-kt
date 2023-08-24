@@ -16,12 +16,12 @@ class Lexing {
 
         fun match(t: TokenKind, v: String) {
             assertEquals(t, token.kind)
-            assertEquals(v, lexer.extract(token.span))
+            assertEquals(v, token.literal)
             token = lexer.nextToken()
         }
 
-        match(TokenKind.IntLiteral, "10")
-        match(TokenKind.StringLiteral, "\"ten\"")
+        match(TokenKind.Int, "10")
+        match(TokenKind.String, "\"ten\"")
         match(TokenKind.Eof, "")
     }
 
@@ -32,17 +32,17 @@ class Lexing {
 
             val token = lexer.nextToken()
             assertEquals(k, token.kind)
-            assertEquals(v, lexer.extract(token.span))
+            assertEquals(v, token.literal)
 
             val eof = lexer.nextToken()
             assertEquals(TokenKind.Eof, eof.kind)
-            assertEquals("", lexer.extract(eof.span))
+            assertEquals("", eof.literal)
         }
 
-        // testing("1234", TokenKind.IntLiteral, "1234")
+        // testing("1234", TokenKind.Int, "1234")
         // testing("1234.", TokenKind.FloatLiteral, "1234.")
         // testing("1234.56", TokenKind.FloatLiteral, "1234.56")
-        testing("\"not enclosed in double quotes", TokenKind.StringLiteral, "\"not enclosed in double quotes")
+        testing("\"not enclosed in double quotes", TokenKind.String, "\"not enclosed in double quotes")
         testing("// starting with comment \"not enclosed in double quotes", TokenKind.Eof, "")
     }
 
@@ -61,34 +61,34 @@ false == !true
 
         fun match(t: TokenKind, v: String) {
             assertEquals(t, token.kind)
-            assertEquals(v, lexer.extract(token.span))
+            assertEquals(v, token.literal)
             token = lexer.nextToken()
         }
 
         match(TokenKind.True, "true")
-        match(TokenKind.NotEqual, "!=")
+        match(TokenKind.NEq, "!=")
         match(TokenKind.False, "false")
 
         match(TokenKind.False, "false")
-        match(TokenKind.Equal, "==")
+        match(TokenKind.Eq, "==")
         match(TokenKind.Bang, "!")
         match(TokenKind.True, "true")
 
-        match(TokenKind.IntLiteral, "10")
-        match(TokenKind.LessEqual, "<=")
-        match(TokenKind.IntLiteral, "10")
+        match(TokenKind.Int, "10")
+        match(TokenKind.LEq, "<=")
+        match(TokenKind.Int, "10")
 
-        match(TokenKind.IntLiteral, "10")
-        match(TokenKind.LessThan, "<")
-        match(TokenKind.IntLiteral, "20")
+        match(TokenKind.Int, "10")
+        match(TokenKind.LT, "<")
+        match(TokenKind.Int, "20")
 
-        match(TokenKind.IntLiteral, "100")
-        match(TokenKind.GreaterThan, ">")
-        match(TokenKind.IntLiteral, "12")
+        match(TokenKind.Int, "100")
+        match(TokenKind.GT, ">")
+        match(TokenKind.Int, "12")
 
-        match(TokenKind.IntLiteral, "12")
-        match(TokenKind.GreaterEqual, ">=")
-        match(TokenKind.IntLiteral, "12")
+        match(TokenKind.Int, "12")
+        match(TokenKind.GEq, ">=")
+        match(TokenKind.Int, "12")
 
         match(TokenKind.Eof, "")
     }

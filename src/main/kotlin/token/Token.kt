@@ -1,3 +1,3 @@
 package token
 
-data class Token(var kind: TokenKind, var span: Span)
+data class Token(val kind: TokenKind, val literal: String)

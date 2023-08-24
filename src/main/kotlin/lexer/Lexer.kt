@@ -1,6 +1,5 @@
 package lexer
 
-import token.Span
 import token.Token
 import token.TokenKind
 
@@ -32,82 +31,53 @@ class Lexer(private val input: String) {
         skipComment()
         skipWhitespace()
 
-        val t = Token(TokenKind.Illegal, Span(pos, 1))
+        return when (ch) {
+            '+' -> char1(TokenKind.Plus)
+            '-' -> char1(TokenKind.Minus)
+            '*' -> char1(TokenKind.Asterisk)
+            '/' -> char1(TokenKind.Slash)
 
-        when (ch) {
-            ',' -> t.kind = TokenKind.Comma
-            ';' -> t.kind = TokenKind.Semicolon
+            '=' -> if (peek() == '=') char2(TokenKind.Eq) else char1(TokenKind.Assign)
+            '!' -> if (peek() == '=') char2(TokenKind.NEq) else char1(TokenKind.Bang)
+            '<' -> if (peek() == '=') char2(TokenKind.LEq) else char1(TokenKind.LT)
+            '>' -> if (peek() == '=') char2(TokenKind.GEq) else char1(TokenKind.GT)
 
-            '(' -> t.kind = TokenKind.LParan
-            ')' -> t.kind = TokenKind.RParan
-            '{' -> t.kind = TokenKind.LBrace
-            '}' -> t.kind = TokenKind.RBrace
+            ',' -> char1(TokenKind.Comma)
+            ';' -> char1(TokenKind.Semicolon)
+            '(' -> char1(TokenKind.Lparan)
+            ')' -> char1(TokenKind.Rparan)
+            '{' -> char1(TokenKind.Lbrace)
+            '}' -> char1(TokenKind.Rbrace)
 
-            '+' -> t.kind = TokenKind.Plus
-            '-' -> t.kind = TokenKind.Minus
-            '*' -> t.kind = TokenKind.Asterisk
-            '/' -> t.kind = TokenKind.Slash
+            '"' -> readString()
 
-            '=' -> {
-                t.kind = if (peak() == '=') {
-                    readChar()
-                    t.span.len = 2
-                    TokenKind.Equal
-                } else TokenKind.Assign
-            }
+            NULL -> eof()
 
-            '!' -> {
-                t.kind = if (peak() == '=') {
-                    readChar()
-                    t.span.len = 2
-                    TokenKind.NotEqual
-                } else TokenKind.Bang
-            }
+            else ->
+                if (ch.isLetter() || ch == '_') readIdent()
+                else if (ch.isDigit()) readNumber()
+                else char1(TokenKind.Illegal)
+        }
+    }
 
-            '<' -> {
-                t.kind = if (peak() == '=') {
-                    readChar()
-                    t.span.len = 2
-                    TokenKind.LessEqual
-                } else TokenKind.LessThan
-            }
+    private fun eof() = Token(TokenKind.Eof, "")
 
-            '>' -> {
-                t.kind = if (peak() == '=') {
-                    readChar()
-                    t.span.len = 2
-                    TokenKind.GreaterEqual
-                } else TokenKind.GreaterThan
-            }
-
-            '"' -> {
-                return readString()
-            }
-
-            NULL -> {
-                t.kind = TokenKind.Eof
-                t.span.len = 0
-            }
-
-            else -> {
-                if (ch.isLetter() || ch == '_') {
-                    t.span = readIdent()
-                    t.kind = lookupIdent(extract(t.span))
-                    return t
-                } else if (ch.isDigit()) {
-                    return readNumber()
-                }
-            }
+    private fun char1(kind: TokenKind) = Token(kind, input.substring(pos, pos + 1))
+        .also {
+            readChar()
         }
 
-        readChar()
-        return t
-    }
+
+    private fun char2(kind: TokenKind) = Token(kind, input.substring(pos, pos + 2))
+        .also {
+            readChar()
+            readChar()
+        }
 
     private fun readString(): Token {
         val start = pos
 
-        // ch is " is checked in nextChar() function
+        // ch is " is checked in nextToken() function
         // so incrementing position to consume first "
         readChar()
 
@@ -122,7 +92,7 @@ class Lexer(private val input: String) {
             readChar()
         }
 
-        return Token(TokenKind.StringLiteral, Span(start, pos - start))
+        return Token(TokenKind.String, input.substring(start, pos))
     }
 
     private fun skipWhitespace() {
@@ -132,7 +102,7 @@ class Lexer(private val input: String) {
     }
 
     private fun skipComment() {
-        if (ch == '/' && peak() == '/') {
+        if (ch == '/' && peek() == '/') {
             readChar()
 
             while (ch != '\n' && ch != NULL) {
@@ -155,9 +125,9 @@ class Lexer(private val input: String) {
 
     private fun readNumber(): Token {
         val start = pos
-        var k = TokenKind.IntLiteral
+        var k = TokenKind.Int
 
-        // ch is digit is checked in nextChar() function
+        // ch is digit is checked in nextToken() function
         // so incrementing position to consume first digit
         readChar()
 
@@ -166,7 +136,7 @@ class Lexer(private val input: String) {
         }
 
         if (ch == '.') {
-            k = TokenKind.FloatLiteral
+            k = TokenKind.Float
             readChar()
 
             while (ch.isDigit()) {
@@ -174,13 +144,13 @@ class Lexer(private val input: String) {
             }
         }
 
-        return Token(k, Span(start, pos - start))
+        return Token(k, input.substring(start, pos))
     }
 
-    private fun readIdent(): Span {
+    private fun readIdent(): Token {
         val start = pos
 
-        // ch is letter or underscore is checked in nextChar() function
+        // ch is letter or underscore is checked in nextToken() function
         // so incrementing position to consume first alphabet or underscore
         readChar()
 
@@ -188,11 +158,11 @@ class Lexer(private val input: String) {
             readChar()
         }
 
-        return Span(start, pos - start)
+        val literal = input.substring(start, pos)
+
+        return Token(lookupIdent(literal), literal)
     }
 
-    private fun peak() = if (readPos < input.length) input[readPos] else NULL
-
-    fun extract(s: Span) = input.slice(s.pos..<s.pos + s.len)
+    private fun peek() = if (readPos < input.length) input[readPos] else NULL
 }
 
